@@ -18,6 +18,7 @@ import org.bson.Document;
 import org.xml.sax.SAXException;
 
 import java.io.File;
+import java.io.FileReader;
 import java.io.IOException;
 
 public class Importer implements IArticleFilter {
@@ -40,15 +41,14 @@ public class Importer implements IArticleFilter {
         this.articles.createIndex(new Document("_id", 1), new IndexOptions().unique(true));
         this.articles.createIndex(new Document("title", 1), new IndexOptions().unique(true));
 
-        WikiXMLParser wxp = new WikiXMLParser(inputFile, this);
+        WikiXMLParser wxp = new WikiXMLParser(new FileReader(inputFile), this);
         wxp.parse();
     }
 
-    public static void main(String[] args) throws IOException, SAXException {
-        new Importer(new File("/media/data/enwiki-20151102-pages-articles.xml.bz2")).run();
-    }
+//    public static void main(String[] args) throws IOException, SAXException {
+//        new Importer(new File("/media/data/enwiki-20151102-pages-articles.xml.bz2")).run();
+//    }
 
-    @Override
     public void process(WikiArticle article, Siteinfo siteinfo) throws SAXException {
         if (article.isMain()) {
             System.out.println("Inserting " + article.getTitle() + " with id " + article.getId() + " into db");
