@@ -38,7 +38,7 @@ public class ArticleController {
 
     @RequestMapping(value = "/api/v1/articles", method = RequestMethod.GET)
     public List<Article> searchArticle(@RequestParam(value = "search") String searchString) {
-        if (searchString == null || searchString == "") {
+        if (searchString == null || searchString.equals("")) {
             throw new IllegalArgumentException("searchString must not be null or empty");
         } else {
             return articleRepository.search(searchString);
