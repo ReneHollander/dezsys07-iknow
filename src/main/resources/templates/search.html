@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <title>iKnow</title>
+
+    <meta charset="utf-8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+    <meta name="viewport" content="initial-scale=1, maximum-scale=1"/>
+
+    <script type="text/javascript" src="webjars/jquery/2.1.4/jquery.min.js"></script>
+    <script type="text/javascript" src="webjars/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+
+    <link rel='stylesheet' href='webjars/bootstrap/3.3.6/css/bootstrap.min.css'/>
+    <style type="text/css">
+        body {
+            padding-top: 50px;
+        }
+
+        .glyphicon-refresh-animate {
+            -animation: spin .7s infinite linear;
+            -webkit-animation: spin2 .7s infinite linear;
+        }
+
+        @-webkit-keyframes spin2 {
+            from {
+                -webkit-transform: rotate(0deg);
+            }
+            to {
+                -webkit-transform: rotate(360deg);
+            }
+        }
+
+        @keyframes spin {
+            from {
+                transform: scale(1) rotate(0deg);
+            }
+            to {
+                transform: scale(1) rotate(360deg);
+            }
+        }
+    </style>
+    <script type="text/javascript">
+        $(function () {
+            var search_string = $("#search-string");
+            var loading_dialog = $("#loading-dialog");
+            var articles = $("#articles");
+            var articles_list = articles.find('.list-group');
+
+            function showLoadingDialog(show) {
+                if (show) {
+                    loading_dialog.css('display', 'block')
+                } else {
+                    loading_dialog.css('display', 'none')
+                }
+            }
+
+            function showArticles(show) {
+                if (show) {
+                    articles.css('display', 'block')
+                } else {
+                    articles.css('display', 'none')
+                }
+            }
+
+            function createArticleEntry(data) {
+                var heading = $("<h4></h4>");
+                heading.attr('class', 'list-group-item-heading');
+                heading.text(data.title);
+
+                var desc = $("<p></p>");
+                desc.attr('class', 'list-group-item-text');
+                desc.text(data.text.substring(0, 100));
+
+                var article = $("<a></a>");
+                article.attr('href', '/articles/' + data.id);
+                article.attr('class', 'list-group-item');
+                article.append(heading);
+                article.append(desc);
+                return article;
+            }
+
+            $("#do-search").click(function () {
+                showArticles(false);
+                showLoadingDialog(true);
+                articles_list.empty();
+                $.get("/api/v1/articles", {search: search_string.val()})
+                        .done(function (data) {
+                            data.forEach(function (article) {
+                                articles_list.append(createArticleEntry(article));
+                            });
+                            showLoadingDialog(false);
+                            showArticles(true)
+                        })
+                        .fail(function (error) {
+                            console.log(error);
+                            showLoadingDialog(false);
+                        });
+            });
+        });
+    </script>
+</head>
+<body>
+
+<nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar"
+                    aria-expanded="false" aria-controls="navbar">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <a class="navbar-brand" href="/">iKnow</a>
+        </div>
+        <div id="navbar" class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <li><a href="/">Home</a></li>
+                <li class="active"><a href="/search">Search</a></li>
+                <li><a href="/crud">CRUD</a></li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
+    <h1>Search for an article</h1>
+    <div class="form-group">
+        <div class="input-group">
+            <input id="search-string" type="text" class="form-control" placeholder="Search for an article"/>
+        <span class="input-group-btn">
+            <button id="do-search" type="submit" class="btn btn-default">
+                <span class="glyphicon glyphicon-search"></span>
+            </button>
+        </span>
+        </div>
+    </div>
+    <div id="loading-dialog" style="display:none" class="alert alert-info alert-dismissible"
+         role="alert">
+        <div style="text-align: center;">
+            Loading articles <span class="glyphicon glyphicon-refresh glyphicon-refresh-animate"></span>
+        </div>
+    </div>
+    <div id="articles" style="display:none">
+        <div class="list-group">
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
