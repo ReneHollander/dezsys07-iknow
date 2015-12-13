@@ -1,4 +1,4 @@
-package at.hackenbergerhollander.iknow.restapi;
+package at.hackenbergerhollander.iknow.rest;
 
 import at.hackenbergerhollander.iknow.data.article.Article;
 import at.hackenbergerhollander.iknow.data.article.ArticleRepository;
