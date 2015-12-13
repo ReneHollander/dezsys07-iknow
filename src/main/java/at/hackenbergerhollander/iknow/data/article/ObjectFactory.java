@@ -53,11 +53,27 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link at.hackenbergerhollander.iknow.Article }
+     * Create an instance of {@link Article }
      * 
      */
     public Article createArticle() {
         return new Article();
+    }
+
+    /**
+     * Create an instance of {@link Articles }
+     *
+     */
+    public Articles createArticles() {
+        return new Articles();
+    }
+
+    /**
+     * Create an instance of {@link GetArticleByTitleRequest }
+     *
+     */
+    public GetArticleByTitleRequest createGetArticleByTitleRequest() {
+        return new GetArticleByTitleRequest();
     }
 
 }
