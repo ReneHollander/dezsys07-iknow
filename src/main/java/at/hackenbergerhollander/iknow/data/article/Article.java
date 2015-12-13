@@ -6,7 +6,19 @@ import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.TextScore;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlType;
+
 @Document
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlType(name = "article", propOrder = {
+        "id",
+        "title",
+        "text",
+        "score"
+})
 public class Article {
 
     @Id
@@ -15,8 +27,10 @@ public class Article {
 
     @TextIndexed
     @Indexed(unique = true)
+    @XmlElement(required = true)
     private String title;
 
+    @XmlElement(required = true)
     private String text;
 
     @TextScore
