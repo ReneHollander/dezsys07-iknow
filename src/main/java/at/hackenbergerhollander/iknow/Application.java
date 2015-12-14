@@ -21,7 +21,7 @@ public class Application implements CommandLineRunner {
     @Autowired
     private ArticleRepository articleRepository;
 
-    private static final boolean DO_IMPORT = false;
+    private static final boolean DO_IMPORT = true;
 
     public static void main(String[] args) throws Exception {
         SpringApplication.run(Application.class, args);

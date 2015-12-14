@@ -56,10 +56,11 @@ public class Parser {
             if (streamReader.getEventType() == XMLStreamReader.START_ELEMENT && "page".equals(streamReader.getLocalName())) {
                 StringWriter writer = new StringWriter();
                 transformer.transform(new StAXSource(streamReader), new StreamResult(writer));
+                Work work = new Work(writer.toString());
                 if (multithread) {
-                    parsePool.execute(new Work(writer.toString()));
+                    parsePool.execute(work);
                 } else {
-                    articleConsumer.accept(parse(writer.toString()));
+                    work.run();
                 }
             } else if (streamReader.hasNext()) {
                 streamReader.next();
@@ -93,20 +94,26 @@ public class Parser {
                 String qName = streamReader.getLocalName();
                 if ("revision".equals(qName)) {
                     revision = true;
+                } else if ("redirect".equals(qName)) {
+                    article.setRedirect(streamReader.getAttributeValue(0));
+                    article.setText(null);
                 }
                 fData.setLength(0);
                 fData.trimToSize();
             } else if (streamReader.getEventType() == XMLStreamReader.END_ELEMENT) {
                 String qName = streamReader.getLocalName();
-                if (!"page".equals(qName)) {
-                    if ("text".equals(qName)) {
+                if ("ns".equals(qName)) {
+                    int ns = Integer.parseInt(fData.toString());
+                    if (ns != 0) {
+                        return null;
+                    }
+                } else if (!revision && "id".equals(qName)) {
+                    article.setId(Integer.parseInt(fData.toString()));
+                } else if ("title".equals(qName)) {
+                    article.setTitle(fData.toString());
+                } else if ("text".equals(qName)) {
+                    if (article.getRedirect() == null) {
                         article.setText(fData.toString());
-                    }
-                    if ("title".equals(qName)) {
-                        article.setTitle(fData.toString());
-                    }
-                    if (!revision && "id".equals(qName)) {
-                        article.setId(Integer.parseInt(fData.toString()));
                     }
                 } else if ("revision".equals(qName)) {
                     revision = false;
@@ -117,7 +124,6 @@ public class Parser {
                 fData.append(streamReader.getText());
             }
         }
-        article.validate();
         return article;
     }
 
@@ -131,7 +137,10 @@ public class Parser {
         @Override
         public void run() {
             try {
-                articleConsumer.accept(parse(xml));
+                Article article = parse(xml);
+                if (article != null) {
+                    articleConsumer.accept(article);
+                }
             } catch (Exception e) {
                 e.printStackTrace();
             }

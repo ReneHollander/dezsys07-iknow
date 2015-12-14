@@ -4,7 +4,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.index.TextIndexed;
 import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.data.mongodb.core.mapping.TextScore;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -16,8 +15,8 @@ import javax.xml.bind.annotation.XmlType;
 @XmlType(name = "article", propOrder = {
         "id",
         "title",
-        "text",
-        "score"
+        "redirect",
+        "text"
 })
 public class Article {
 
@@ -30,19 +29,20 @@ public class Article {
     @XmlElement(required = true)
     private String title;
 
-    @XmlElement(required = true)
-    private String text;
+    @XmlElement(required = false)
+    private String redirect;
 
-    @TextScore
-    private Float score;
+    @XmlElement(required = false)
+    private String text;
 
     public Article() {
         this.id = -1;
     }
 
-    public Article(int id, String title, String text) {
+    public Article(int id, String title, String redirect, String text) {
         this.id = id;
         this.title = title;
+        this.redirect = redirect;
         this.text = text;
     }
 
@@ -62,20 +62,20 @@ public class Article {
         this.title = title;
     }
 
+    public String getRedirect() {
+        return redirect;
+    }
+
+    public void setRedirect(String redirect) {
+        this.redirect = redirect;
+    }
+
     public String getText() {
         return text;
     }
 
     public void setText(String text) {
         this.text = text;
-    }
-
-    public void validate() {
-        if (id == -1) {
-            throw new RuntimeException("invalid id");
-        } else if (title == null || title.trim().equals("")) {
-            throw new RuntimeException("invalid title");
-        }
     }
 
     @Override
@@ -87,6 +87,7 @@ public class Article {
 
         if (id != article.id) return false;
         if (title != null ? !title.equals(article.title) : article.title != null) return false;
+        if (redirect != null ? !redirect.equals(article.redirect) : article.redirect != null) return false;
         return text != null ? text.equals(article.text) : article.text == null;
 
     }
@@ -95,6 +96,7 @@ public class Article {
     public int hashCode() {
         int result = id;
         result = 31 * result + (title != null ? title.hashCode() : 0);
+        result = 31 * result + (redirect != null ? redirect.hashCode() : 0);
         result = 31 * result + (text != null ? text.hashCode() : 0);
         return result;
     }
@@ -104,6 +106,7 @@ public class Article {
         return "Article{" +
                 "id=" + id +
                 ", title='" + title + '\'' +
+                ", redirect='" + redirect + '\'' +
                 '}';
     }
 }
