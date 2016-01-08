@@ -70,7 +70,9 @@
 
                 var desc = $("<p></p>");
                 desc.attr('class', 'list-group-item-text');
-                desc.text(data.text.substring(0, 100));
+                if (data.text) {
+                    desc.text(data.text.substring(0, 100));
+                }
 
                 var article = $("<a></a>");
                 article.attr('href', '/articles/' + data.id);
